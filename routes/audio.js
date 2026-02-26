@@ -65,7 +65,7 @@ router.post('/api/agents/:ip/cleanup', authMiddleware, adminMiddleware, async (r
 });
 
 // ===================== ПРОКСИ ДЛЯ АУДИОФАЙЛОВ =====================
-router.get('/api/agents/:ip/records/:filename', authMiddleware, authMiddleware, async (req, res) => {
+router.get('/api/agents/:ip/records/:filename', authMiddleware, adminMiddleware, async (req, res) => {
     const { ip, filename } = req.params;
     const url = `http://${ip}:5000/records/${encodeURIComponent(filename)}`;
 
@@ -83,7 +83,7 @@ router.get('/api/agents/:ip/records/:filename', authMiddleware, authMiddleware, 
 });
 
 // ===================== СТРАНИЦА АУДИО =====================
-router.get('/audio', authMiddleware, authMiddleware, (req, res) => {
+router.get('/audio', authMiddleware, adminMiddleware, (req, res) => {
     res.sendFile('audio.html', { root: './public' });
 });
 

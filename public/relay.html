@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relay Time Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1><i class="fas fa-lightbulb"></i> Панель управления освещением</h1>
+        </div>
+        <div class="header-right">
+            <span id="current-user" class="user-badge"><i class="fas fa-user"></i> </span>
+            <button id="table-link" class="btn btn-outline"><i class="fas fa-table"></i> К таблице</button>
+            <button id="admin-link" class="btn btn-outline" style="display: none;"><i class="fas fa-cog"></i> Админка</button>
+            <button id="audio-link" class="btn btn-outline" style="display: none;"><i class="fas fa-microphone"></i> Аудио</button>
+            <button id="logout-btn" class="btn btn-outline"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+        </div>
+    </div>
+
+    <div class="relay-container">
+        <!-- Кнопка добавления устройства -->
+        <div style="display: flex; justify-content: center; margin-bottom: 30px;">
+            <button id="add-device-main-btn" class="btn btn-primary" style="padding: 12px 30px; font-size: 1.1em;">
+                <i class="fas fa-plus-circle"></i> Добавить новое устройство
+            </button>
+        </div>
+
+        <div class="devices-grid" id="devicesGrid"></div>
+    </div>
+
+    <!-- Модальное окно для расписания -->
+    <div class="modal" id="scheduleModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Новое расписание</h3>
+            <form id="scheduleForm">
+                <input type="hidden" id="scheduleId">
+                <input type="hidden" id="modalDeviceId">
+
+                <div class="form-group">
+                    <label>Канал</label>
+                    <select id="channel" required>
+                        <option value="0">Канал 1</option>
+                        <option value="1">Канал 2</option>
+                        <option value="2">Канал 3</option>
+                        <option value="3">Канал 4</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Время начала</label>
+                    <div class="time-inputs">
+                        <input type="number" id="startHour" min="0" max="23" placeholder="Час" required>
+                        <input type="number" id="startMinute" min="0" max="59" placeholder="Минуты" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Время окончания</label>
+                    <div class="time-inputs">
+                        <input type="number" id="endHour" min="0" max="23" placeholder="Час" required>
+                        <input type="number" id="endMinute" min="0" max="59" placeholder="Минуты" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Дни недели</label>
+                    <div class="days-grid">
+                        <label class="day-checkbox">
+                            <input type="checkbox" id="monday" checked> Пн
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" id="tuesday" checked> Вт
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" id="wednesday" checked> Ср
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" id="thursday" checked> Чт
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" id="friday" checked> Пт
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" id="saturday" checked> Сб
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" id="sunday" checked> Вс
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="day-checkbox">
+                        <input type="checkbox" id="enabled" checked> Расписание активно
+                    </label>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.closeModal()">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно для устройства -->
+    <div class="modal" id="deviceModal">
+        <div class="modal-content">
+            <h3>Новое устройство</h3>
+            <form id="deviceForm">
+                <div class="form-group">
+                    <label>ID устройства</label>
+                    <input type="text" id="deviceId" placeholder="esp8266_001" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Название</label>
+                    <input type="text" id="deviceName" placeholder="Реле в гараже" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Расположение</label>
+                    <input type="text" id="deviceLocation" placeholder="Гараж">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.closeDeviceModal()">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/relay.js"></script>
+</body>
+</html>

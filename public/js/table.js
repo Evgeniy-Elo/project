@@ -24,11 +24,17 @@ async function loadUser() {
         if (currentUser.is_admin) {
             document.getElementById('admin-btn').style.display = 'inline-flex';
         }
-        if (currentUser.roles && currentUser.roles.includes('audio')) {
+        // После загрузки пользователя
+       if (currentUser.roles && currentUser.roles.includes('relay')) {
+            document.getElementById('relay-btn').style.display = 'inline-flex';
+       } else {
+            document.getElementById('relay-btn').style.display = 'none';
+       }
+       if (currentUser.roles && currentUser.roles.includes('audio')) {
             document.getElementById('audio-btn').style.display = 'inline-flex';
-        } else {
+       } else {
             document.getElementById('audio-btn').style.display = 'none';
-        }
+       }
     } else {
         document.getElementById('login-form').style.display = 'flex';
     }
@@ -39,6 +45,7 @@ function setupEventListeners() {
     document.getElementById('logout-btn').addEventListener('click', logout);
     document.getElementById('admin-btn').addEventListener('click', () => {window.location.href = '/admin.html';});
     document.getElementById('audio-btn').addEventListener('click', () => {window.location.href = '/audio';});
+    document.getElementById('relay-btn').addEventListener('click', () => {window.location.href = '/relay';});
 
     // Глобальные клавиши для навигации
     document.addEventListener('keydown', handleGlobalKeys);
