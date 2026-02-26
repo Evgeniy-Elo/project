@@ -6,8 +6,8 @@ let manualStates = {};
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadUser();
+    setupNavigation();
     if (currentUser) {
-        updateNavigation();
         loadDevices();
     }
     setupEventListeners();
@@ -26,26 +26,35 @@ async function loadUser() {
     }
 }
 
-function updateNavigation() {
-    const tableBtn = document.getElementById('table-link');
-    if (tableBtn) tableBtn.style.display = 'inline-flex';
+function setupNavigation() {
+    const navLinks = document.getElementById('nav-links');
+    if (!navLinks) return;
 
-    const adminBtn = document.getElementById('admin-link');
-    if (adminBtn) {
-        if (currentUser.roles && currentUser.roles.includes('admin')) {
-            adminBtn.style.display = 'inline-flex';
-        } else {
-            adminBtn.style.display = 'none';
-        }
+    navLinks.innerHTML = '';
+
+    // Кнопка "К таблице" (доступна всем)
+    navLinks.innerHTML += `
+        <a href="/" class="nav-btn">
+            <i class="fas fa-table"></i> К таблице
+        </a>
+    `;
+
+    // Кнопка "Аудио" (если есть роль audio)
+    if (currentUser?.roles?.includes('audio')) {
+        navLinks.innerHTML += `
+            <a href="/audio" class="nav-btn">
+                <i class="fas fa-microphone"></i> Аудио
+            </a>
+        `;
     }
 
-    const audioBtn = document.getElementById('audio-link');
-    if (audioBtn) {
-        if (currentUser.roles && currentUser.roles.includes('audio')) {
-            audioBtn.style.display = 'inline-flex';
-        } else {
-            audioBtn.style.display = 'none';
-        }
+    // Кнопка "Админка" (если есть роль admin)
+    if (currentUser?.roles?.includes('admin')) {
+        navLinks.innerHTML += `
+            <a href="/admin.html" class="nav-btn">
+                <i class="fas fa-cog"></i> Админка
+            </a>
+        `;
     }
 }
 
@@ -59,28 +68,9 @@ function setupEventListeners() {
     const deviceForm = document.getElementById('deviceForm');
     if (deviceForm) deviceForm.addEventListener('submit', addDevice);
 
-    const tableLink = document.getElementById('table-link');
-    if (tableLink) {
-        tableLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.location.href = '/';
-        });
-    }
-
-    const adminLink = document.getElementById('admin-link');
-    if (adminLink) {
-        adminLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.location.href = '/admin.html';
-        });
-    }
-
-    const audioLink = document.getElementById('audio-link');
-    if (audioLink) {
-        audioLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.location.href = '/audio';
-        });
+    const addDeviceMainBtn = document.getElementById('add-device-main-btn');
+    if (addDeviceMainBtn) {
+        addDeviceMainBtn.addEventListener('click', () => window.showAddDeviceModal());
     }
 }
 

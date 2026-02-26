@@ -1,11 +1,10 @@
 // Состояние приложения
 let currentUser = null;
-let selectedCellId = null;          // ID выделенной ячейки (без блокировки)
-let editingCellId = null;           // ID ячейки, которую мы редактируем (заблокирована нами)
-let cellsData = [];                 // массив всех ячеек { id, row_index, col_index, value }
-let lockedCells = {};               // объект { cellId: username } для заблокированных другими
+let selectedCellId = null;
+let editingCellId = null;
+let cellsData = [];
+let lockedCells = {};
 
-// DOM элементы
 let statusBar;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -21,31 +20,47 @@ async function loadUser() {
         document.getElementById('login-form').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
         document.getElementById('current-user').innerHTML = `<i class="fas fa-user"></i> ${currentUser.username}`;
-        if (currentUser.is_admin) {
-            document.getElementById('admin-btn').style.display = 'inline-flex';
-        }
-        // После загрузки пользователя
-       if (currentUser.roles && currentUser.roles.includes('relay')) {
-            document.getElementById('relay-btn').style.display = 'inline-flex';
-       } else {
-            document.getElementById('relay-btn').style.display = 'none';
-       }
-       if (currentUser.roles && currentUser.roles.includes('audio')) {
-            document.getElementById('audio-btn').style.display = 'inline-flex';
-       } else {
-            document.getElementById('audio-btn').style.display = 'none';
-       }
+        setupNavigation();
     } else {
         document.getElementById('login-form').style.display = 'flex';
+    }
+}
+
+function setupNavigation() {
+    const navLinks = document.getElementById('nav-links');
+    navLinks.innerHTML = '';
+
+    // Кнопка "Аудио" (если есть роль audio)
+    if (currentUser?.roles?.includes('audio')) {
+        navLinks.innerHTML += `
+            <a href="/audio" class="nav-btn">
+                <i class="fas fa-microphone"></i> Аудио
+            </a>
+        `;
+    }
+
+    // Кнопка "Реле" (если есть роль relay)
+    if (currentUser?.roles?.includes('relay')) {
+        navLinks.innerHTML += `
+            <a href="/relay" class="nav-btn">
+                <i class="fas fa-lightbulb"></i> Реле
+            </a>
+        `;
+    }
+
+    // Кнопка "Админка" (если есть роль admin)
+    if (currentUser?.roles?.includes('admin')) {
+        navLinks.innerHTML += `
+            <a href="/admin.html" class="nav-btn">
+                <i class="fas fa-cog"></i> Админка
+            </a>
+        `;
     }
 }
 
 function setupEventListeners() {
     document.getElementById('login-btn').addEventListener('click', login);
     document.getElementById('logout-btn').addEventListener('click', logout);
-    document.getElementById('admin-btn').addEventListener('click', () => {window.location.href = '/admin.html';});
-    document.getElementById('audio-btn').addEventListener('click', () => {window.location.href = '/audio';});
-    document.getElementById('relay-btn').addEventListener('click', () => {window.location.href = '/relay';});
 
     // Глобальные клавиши для навигации
     document.addEventListener('keydown', handleGlobalKeys);
@@ -71,6 +86,8 @@ async function logout() {
     await fetch('/auth/logout', { method: 'POST' });
     location.reload();
 }
+
+// ... остальной код table.js без изменений ...
 
 // Рендер таблицы (вызывается из socket.js)
 window.renderTable = function(cells) {

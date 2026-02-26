@@ -2,15 +2,7 @@ let currentUser = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadUser();
-    if (currentUser) {
-        document.getElementById('current-user').innerHTML = `<i class="fas fa-user"></i> ${currentUser.username}`;
-        if (currentUser.roles && currentUser.roles.includes('admin')) {
-            document.getElementById('admin-link').style.display = 'inline-block';
-        } else {
-            document.getElementById('admin-link').style.display = 'none';
-        }
-        loadAgents();
-    }
+    setupNavigation();
     document.getElementById('logout-btn').addEventListener('click', logout);
 });
 
@@ -18,20 +10,47 @@ async function loadUser() {
     const res = await fetch('/auth/me');
     if (res.ok) {
         currentUser = await res.json();
+
         // Если у пользователя нет роли audio – редирект на главную
         if (!currentUser.roles || !currentUser.roles.includes('audio')) {
             window.location.href = '/';
             return;
         }
+
         document.getElementById('current-user').innerHTML = `<i class="fas fa-user"></i> ${currentUser.username}`;
-        if (currentUser.roles.includes('admin')) {
-            document.getElementById('admin-link').style.display = 'inline-flex';
-        } else {
-            document.getElementById('admin-link').style.display = 'none';
-        }
         loadAgents();
     } else if (res.status === 401) {
         window.location.href = '/';
+    }
+}
+
+function setupNavigation() {
+    const navLinks = document.getElementById('nav-links');
+    navLinks.innerHTML = '';
+
+    // Кнопка "К таблице" (доступна всем)
+    navLinks.innerHTML += `
+        <a href="/" class="nav-btn">
+            <i class="fas fa-table"></i> К таблице
+        </a>
+    `;
+
+    // Кнопка "Реле" (если есть роль relay)
+    if (currentUser?.roles?.includes('relay')) {
+        navLinks.innerHTML += `
+            <a href="/relay" class="nav-btn">
+                <i class="fas fa-lightbulb"></i> Реле
+            </a>
+        `;
+    }
+
+    // Кнопка "Админка" (если есть роль admin)
+    if (currentUser?.roles?.includes('admin')) {
+        navLinks.innerHTML += `
+            <a href="/admin.html" class="nav-btn">
+                <i class="fas fa-cog"></i> Админка
+            </a>
+        `;
     }
 }
 
@@ -108,12 +127,13 @@ function renderAgentCard(agent, container) {
     }
 
     card.innerHTML = `
-        <h3>${agent.name} — ${agent.ip}</h3>
+        <h3><i class="fas fa-microchip"></i> ${agent.name}</h3>
+        <p><i class="fas fa-network-wired"></i> ${agent.ip}</p>
         <div class="badge ${statusClass}">${statusText}</div>
         ${alertHtml}
         <p><i class="fas fa-folder"></i> Папка: ${agent.status.path || '—'}</p>
         ${actionButtons}
-        <h4>Файлы:</h4>
+        <h4><i class="fas fa-music"></i> Файлы:</h4>
         ${filesHtml}
         ${deleteBtn}
         <audio id="player-${agent.ip.replace(/\./g,'-')}" controls></audio>

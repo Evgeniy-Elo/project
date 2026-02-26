@@ -9,77 +9,154 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
-    <script defer src="/js/admin.js"></script>
 </head>
 <body>
     <div class="header">
         <div class="header-left">
             <h1><i class="fas fa-cog"></i> Панель администратора</h1>
+            <div class="nav-links" id="nav-links">
+                <!-- Навигационные кнопки будут вставлены через JS -->
+            </div>
         </div>
         <div class="header-right">
             <span id="current-user" class="user-badge"><i class="fas fa-user"></i> </span>
-            <button id="back-to-table" class="btn btn-outline"><i class="fas fa-arrow-left"></i> К таблице</button>
-            <button id="audio-btn" class="btn btn-outline"><i class="fas fa-microphone"></i> Аудио</button>
-            <button id="relay-btn" class="btn btn-outline"><i class="fas fa-lightbulb"></i> Реле</button>
             <button id="logout-btn" class="btn btn-outline"><i class="fas fa-sign-out-alt"></i> Выйти</button>
         </div>
     </div>
 
     <div class="tabs">
-        <button class="tab-btn active" data-tab="users">Пользователи</button>
-        <button class="tab-btn" data-tab="history">История изменений</button>
+        <button class="tab-btn active" data-tab="users">
+            <i class="fas fa-users"></i> Пользователи
+        </button>
+        <button class="tab-btn" data-tab="history">
+            <i class="fas fa-history"></i> История изменений
+        </button>
     </div>
 
+    <!-- Вкладка пользователей -->
     <div id="users-tab" class="tab-content active">
-        <h2>Управление пользователями</h2>
-        <form id="add-user-form">
-            <input type="text" id="new-username" placeholder="Логин" required>
-            <input type="password" id="new-password" placeholder="Пароль" required>
-            <div class="role-checkboxes">
-                <label><input type="checkbox" name="roles" value="admin"> Администратор</label>
-                <label><input type="checkbox" name="roles" value="audio"> Аудио</label>
-                <label><input type="checkbox" name="roles" value="relay"> Реле</label>
-        <!-- можно добавить другие роли -->
+        <div class="card" style="margin-bottom: 20px;">
+            <h2 style="margin-bottom: 20px; font-size: 18px;">
+                <i class="fas fa-user-plus" style="color: var(--primary-color); margin-right: 10px;"></i>
+                Добавить нового пользователя
+            </h2>
+            <form id="add-user-form" class="admin-form">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Логин</label>
+                        <input type="text" id="new-username" placeholder="Введите логин" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i> Пароль</label>
+                        <input type="password" id="new-password" placeholder="Введите пароль" required>
+                    </div>
+                </div>
+
+                <div class="role-checkboxes">
+                    <label style="font-weight: 500; margin-bottom: 10px;">
+                        <i class="fas fa-tags"></i> Роли пользователя:
+                    </label>
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <label class="role-label">
+                            <input type="checkbox" name="roles" value="admin">
+                            <i class="fas fa-shield-alt"></i> Администратор
+                        </label>
+                        <label class="role-label">
+                            <input type="checkbox" name="roles" value="audio">
+                            <i class="fas fa-microphone"></i> Аудио
+                        </label>
+                        <label class="role-label">
+                            <input type="checkbox" name="roles" value="relay">
+                            <i class="fas fa-lightbulb"></i> Реле
+                        </label>
+                        <label class="role-label">
+                            <input type="checkbox" name="roles" value="viewer">
+                            <i class="fas fa-eye"></i> Просмотр
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="margin-top: 20px;">
+                    <i class="fas fa-plus-circle"></i> Добавить пользователя
+                </button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2 style="margin-bottom: 20px; font-size: 18px;">
+                <i class="fas fa-list" style="color: var(--primary-color); margin-right: 10px;"></i>
+                Список пользователей
+            </h2>
+            <div style="overflow-x: auto;">
+                <table class="admin-table" id="users-table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag"></i> ID</th>
+                            <th><i class="fas fa-user"></i> Логин</th>
+                            <th><i class="fas fa-tags"></i> Роли</th>
+                            <th><i class="fas fa-calendar"></i> Дата создания</th>
+                            <th><i class="fas fa-cog"></i> Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
-            <button type="submit">Добавить</button>
-        </form>
-        <table id="users-table" class="admin-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Логин</th>
-                    <th>Роли</th>
-                    <th>Дата создания</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        </div>
     </div>
 
+    <!-- Вкладка истории -->
     <div id="history-tab" class="tab-content">
-        <h2>История изменений</h2>
-        <div class="filters">
-            <select id="filter-user">
-                <option value="">Все пользователи</option>
-            </select>
-            <input type="date" id="filter-from" placeholder="С даты">
-            <input type="date" id="filter-to" placeholder="По дату">
-            <button id="apply-filters" class="btn btn-primary">Применить</button>
+        <div class="card" style="margin-bottom: 20px;">
+            <h2 style="margin-bottom: 20px; font-size: 18px;">
+                <i class="fas fa-filter" style="color: var(--primary-color); margin-right: 10px;"></i>
+                Фильтры истории
+            </h2>
+            <div class="filters">
+                <div class="form-group" style="min-width: 200px;">
+                    <label><i class="fas fa-user"></i> Пользователь</label>
+                    <select id="filter-user">
+                        <option value="">Все пользователи</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-start"></i> С даты</label>
+                    <input type="date" id="filter-from" placeholder="С даты">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-end"></i> По дату</label>
+                    <input type="date" id="filter-to" placeholder="По дату">
+                </div>
+                <div class="form-group" style="display: flex; align-items: flex-end;">
+                    <button id="apply-filters" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Применить
+                    </button>
+                </div>
+            </div>
         </div>
-        <table id="history-table" class="admin-table">
-            <thead>
-                <tr>
-                    <th>Дата</th>
-                    <th>Пользователь</th>
-                    <th>Строка</th>
-                    <th>Столбец</th>
-                    <th>Было</th>
-                    <th>Стало</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+
+        <div class="card">
+            <h2 style="margin-bottom: 20px; font-size: 18px;">
+                <i class="fas fa-clock-rotate-left" style="color: var(--primary-color); margin-right: 10px;"></i>
+                История изменений
+            </h2>
+            <div style="overflow-x: auto;">
+                <table class="admin-table" id="history-table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-calendar"></i> Дата</th>
+                            <th><i class="fas fa-user"></i> Пользователь</th>
+                            <th><i class="fas fa-layer-group"></i> Строка</th>
+                            <th><i class="fas fa-layer-group"></i> Столбец</th>
+                            <th><i class="fas fa-arrow-left"></i> Было</th>
+                            <th><i class="fas fa-arrow-right"></i> Стало</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
     </div>
+
+    <script src="/js/admin.js"></script>
 </body>
 </html>
