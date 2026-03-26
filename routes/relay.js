@@ -26,7 +26,7 @@ router.post('/api/device/register', async (req, res) => {
         );
         res.json({ success: true, message: 'Устройство зарегистрировано' });
     } catch (error) {
-        console.error('Error registering device:', error);
+        logger.error('Error registering device: ' + error.message);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -67,7 +67,7 @@ router.get('/api/schedules/:deviceId', async (req, res) => {
 
         res.json(schedules);
     } catch (error) {
-        console.error('Error fetching schedules:', error);
+        logger.error('Error fetching schedules: ' + error.message);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -101,12 +101,12 @@ router.post('/api/device/notify/:deviceId', authMiddleware, hasRole('relay'), as
             await axios.post(`http://${deviceIp}:80/sync`, {}, { timeout: 3000 });
             res.json({ success: true, message: 'Устройство уведомлено' });
         } catch (error) {
-            console.error('Error notifying device:', error);
+            logger.error('Error notifying device: ' + error.message);
             // Не возвращаем ошибку, так как устройство может быть офлайн
             res.json({ success: true, warning: 'Устройство недоступно, обновит расписания при следующей синхронизации' });
         }
     } catch (error) {
-        console.error('Error notifying device:', error);
+        logger.error('Error notifying device: ' + error.message);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -123,7 +123,7 @@ router.get('/api/devices', authMiddleware, hasRole('relay'), async (req, res) =>
         `);
         res.json(rows);
     } catch (error) {
-        console.error('Error fetching devices:', error);
+        logger.error('Error fetching devices: ' + error.message);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -143,7 +143,7 @@ router.post('/api/devices', authMiddleware, hasRole('relay'), async (req, res) =
         );
         res.json({ success: true, message: 'Устройство добавлено' });
     } catch (error) {
-        console.error('Error adding device:', error);
+        logger.error('Error adding device: ' + error.message);
         if (error.code === 'ER_DUP_ENTRY') {
             return res.status(409).json({ error: 'Устройство с таким ID уже существует' });
         }
@@ -166,7 +166,7 @@ router.get('/api/schedules', authMiddleware, hasRole('relay'), async (req, res) 
         );
         res.json(rows);
     } catch (error) {
-        console.error('Error fetching schedules:', error);
+        logger.error('Error fetching schedules: ' + error.message);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -207,12 +207,12 @@ router.post('/api/schedules', authMiddleware, hasRole('relay'), async (req, res)
         try {
             await notifyDevice(schedule.device_id);
         } catch (notifyError) {
-            console.log('Device offline, will sync later');
+            logger.debug('Device offline, will sync later');
         }
 
         res.json({ id: result.insertId, ...schedule });
     } catch (error) {
-        console.error('Error creating schedule:', error);
+        logger.error('Error creating schedule: ' + error.message);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -255,13 +255,13 @@ router.put('/api/schedules/:id', authMiddleware, hasRole('relay'), async (req, r
             try {
                 await notifyDevice(scheduleInfo[0].device_id);
             } catch (notifyError) {
-                console.log('Device offline, will sync later');
+                logger.debug('Device offline, will sync later');
             }
         }
 
         res.json({ success: true });
     } catch (error) {
-        console.error('Error updating schedule:', error);
+        logger.error('Error updating schedule: ' + error.message);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -279,13 +279,13 @@ router.delete('/api/schedules/:id', authMiddleware, hasRole('relay'), async (req
             try {
                 await notifyDevice(scheduleInfo[0].device_id);
             } catch (notifyError) {
-                console.log('Device offline, will sync later');
+                logger.debug('Device offline, will sync later');
             }
         }
 
         res.json({ success: true });
     } catch (error) {
-        console.error('Error deleting schedule:', error);
+        logger.error('Error deleting schedule: ' + error.message);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -325,15 +325,15 @@ router.post('/api/manual-control', authMiddleware, hasRole('relay'), async (req,
             }, { timeout: 3000 });
 
             // Логируем действие
-            console.log(`Ручное управление: устройство ${deviceId}, канал ${channel}, состояние ${state}`);
+            logger.info(`Manual control: device ${deviceId}, channel ${channel}, state ${state}`);
 
             res.json({ success: true });
         } catch (error) {
-            console.error('Error sending command to ESP:', error);
+            logger.error('Error sending command to ESP: ' + error.message);
             res.status(502).json({ error: 'Устройство недоступно' });
         }
     } catch (error) {
-        console.error('Error in manual control:', error);
+        logger.error('Error in manual control: ' + error.message);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -367,11 +367,11 @@ router.post('/api/manual-control/reset', authMiddleware, hasRole('relay'), async
             await axios.post(`http://${deviceIp}:80/manual/reset`, {}, { timeout: 3000 });
             res.json({ success: true });
         } catch (error) {
-            console.error('Error resetting manual mode:', error);
+            logger.error('Error resetting manual mode: ' + error.message);
             res.status(502).json({ error: 'Устройство недоступно' });
         }
     } catch (error) {
-        console.error('Error resetting manual mode:', error);
+        logger.error('Error resetting manual mode: ' + error.message);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -382,7 +382,7 @@ router.delete('/api/devices/:id', authMiddleware, hasRole('relay'), async (req, 
         await db.execute('DELETE FROM relay_devices WHERE id = ?', [req.params.id]);
         res.json({ success: true });
     } catch (error) {
-        console.error('Error deleting device:', error);
+        logger.error('Error deleting device: ' + error.message);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -395,9 +395,9 @@ async function notifyDevice(deviceId) {
     const axios = require('axios');
     try {
         await axios.post(`http://${devices[0].ip_address}:80/sync`, {}, { timeout: 2000 });
-        console.log(`Device ${deviceId} notified successfully`);
+        logger.debug(`Device ${deviceId} notified successfully`);
     } catch (error) {
-        console.log(`Device ${deviceId} offline, will sync later`);
+        logger.debug(`Device ${deviceId} offline, will sync later`);
         throw error;
     }
 }

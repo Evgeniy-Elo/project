@@ -1,0 +1,79 @@
+name: "🧪 Tests & Validation"
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x]
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: transfers_test
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 3306:3306
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Initialize test database
+      run: |
+        npm run test:db:init || mysql -h 127.0.0.1 -u root -proot transfers_test < sql/init.sql
+
+    - name: Run security tests
+      run: npm run test:security
+
+    - name: Run performance tests
+      run: npm run test:performance
+
+    - name: Run all unit tests
+      run: npm test -- --ci --coverage
+
+    - name: Check syntax
+      run: |
+        for file in $(find . -name "*.js" -not -path "./node_modules/*"); do
+          node -c "$file"
+        done
+
+    - name: Validate CSS
+      run: |
+        open_braces=$(grep -o '{' public/css/style.css | wc -l)
+        close_braces=$(grep -o '}' public/css/style.css | wc -l)
+        if [ "$open_braces" -ne "$close_braces" ]; then
+          echo "CSS syntax error: braces mismatch"
+          exit 1
+        fi
+
+    - name: Security audit
+      run: npm audit --audit-level=moderate || true
+
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/coverage-final.json
+        flags: unittests
+        name: codecov-umbrella
