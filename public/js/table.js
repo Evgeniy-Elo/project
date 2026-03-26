@@ -4,8 +4,32 @@ let selectedCellId = null;
 let editingCellId = null;
 let cellsData = [];
 let lockedCells = {};
+let renderedCells = new Map(); // Кэш отрендеренных ячеек
 
 let statusBar;
+
+// Константы для virtual scrolling
+const ROWS_PER_VIEW = 20;
+const COLS_PER_VIEW = 10;
+
+// Функция для показа уведомлений
+function showNotification(message, type = 'info', duration = 3000) {
+    const notif = document.createElement('div');
+    notif.className = `notification notification-${type}`;
+    const icon = type === 'error' ? 'exclamation-circle' : type === 'success' ? 'check-circle' : 'info-circle';
+    notif.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+    
+    document.body.appendChild(notif);
+    
+    setTimeout(() => {
+        notif.classList.add('show');
+    }, 10);
+    
+    setTimeout(() => {
+        notif.classList.remove('show');
+        setTimeout(() => notif.remove(), 300);
+    }, duration);
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     statusBar = document.getElementById('status-bar');
@@ -14,15 +38,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadUser() {
-    const res = await fetch('/auth/me');
-    if (res.ok) {
-        currentUser = await res.json();
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('main-content').style.display = 'block';
-        document.getElementById('current-user').innerHTML = `<i class="fas fa-user"></i> ${currentUser.username}`;
-        setupNavigation();
-    } else {
-        document.getElementById('login-form').style.display = 'flex';
+    try {
+        const res = await fetch('/auth/me');
+        if (res.ok) {
+            currentUser = await res.json();
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('current-user').innerHTML = `<i class="fas fa-user"></i> ${currentUser.username}`;
+            setupNavigation();
+        } else {
+            document.getElementById('login-form').style.display = 'flex';
+        }
+    } catch (error) {
+        console.error('Error loading user:', error);
+        document.getElementById('login-error').textContent = 'Ошибка при загрузке профиля';
     }
 }
 
@@ -30,7 +59,6 @@ function setupNavigation() {
     const navLinks = document.getElementById('nav-links');
     navLinks.innerHTML = '';
 
-    // Кнопка "Аудио" (если есть роль audio)
     if (currentUser?.roles?.includes('audio')) {
         navLinks.innerHTML += `
             <a href="/audio" class="nav-btn">
@@ -39,7 +67,6 @@ function setupNavigation() {
         `;
     }
 
-    // Кнопка "Реле" (если есть роль relay)
     if (currentUser?.roles?.includes('relay')) {
         navLinks.innerHTML += `
             <a href="/relay" class="nav-btn">
@@ -48,7 +75,6 @@ function setupNavigation() {
         `;
     }
 
-    // Кнопка "Админка" (если есть роль admin)
     if (currentUser?.roles?.includes('admin')) {
         navLinks.innerHTML += `
             <a href="/admin.html" class="nav-btn">
@@ -62,34 +88,61 @@ function setupEventListeners() {
     document.getElementById('login-btn').addEventListener('click', login);
     document.getElementById('logout-btn').addEventListener('click', logout);
 
+    // Ввод через Enter на поле пароля
+    document.getElementById('password')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') login();
+    });
+
     // Глобальные клавиши для навигации
     document.addEventListener('keydown', handleGlobalKeys);
 }
 
 async function login() {
-    const username = document.getElementById('username').value;
+    const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
-    const res = await fetch('/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-    });
-    const data = await res.json();
-    if (data.success) {
-        window.location.href = data.redirectTo || '/';
-    } else {
-        document.getElementById('login-error').textContent = data.error || 'Ошибка входа';
+    const errorEl = document.getElementById('login-error');
+    
+    if (!username || !password) {
+        errorEl.textContent = 'Пожалуйста, заполните оба поля';
+        return;
+    }
+
+    try {
+        const res = await fetch('/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+            window.location.href = data.redirectTo || '/';
+        } else {
+            errorEl.textContent = data.error || 'Ошибка входа';
+            showNotification(data.error || 'Ошибка входа', 'error');
+        }
+    } catch (error) {
+        errorEl.textContent = 'Ошибка подключения к серверу';
+        showNotification('Ошибка подключения к серверу', 'error');
+        console.error('Login error:', error);
     }
 }
 
 async function logout() {
-    await fetch('/auth/logout', { method: 'POST' });
-    location.reload();
+    if (confirm('Вы уверены, что хотите выйти?')) {
+        try {
+            await fetch('/auth/logout', { method: 'POST' });
+            showNotification('Вы вышли из системы', 'success', 1500);
+            setTimeout(() => location.reload(), 1500);
+        } catch (error) {
+            console.error('Logout error:', error);
+            showNotification('Ошибка при выходе', 'error');
+        }
+    }
 }
 
 // ... остальной код table.js без изменений ...
 
-// Рендер таблицы (вызывается из socket.js)
+// Рендер таблицы (оптимизированный вариант)
 window.renderTable = function(cells) {
     cellsData = cells;
     const container = document.getElementById('table-container');
@@ -107,32 +160,68 @@ window.renderTable = function(cells) {
 
     const sortedRows = Array.from(rowsMap.keys()).sort((a,b) => a - b);
 
-    let html = '<table><thead><tr>';
-    // Заголовок
+    // Используем DocumentFragment для более быстрого DOM манипулирования
+    const fragment = document.createDocumentFragment();
+    const table = document.createElement('table');
+    
+    // Создаем заголовок
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
     for (let cell of headerCells) {
-        html += `<th data-cell-id="${cell.id}">${escapeHtml(cell.value)}</th>`;
+        const th = document.createElement('th');
+        th.setAttribute('data-cell-id', cell.id);
+        th.textContent = escapeHtml(cell.value);
+        headerRow.appendChild(th);
     }
-    html += '</tr></thead><tbody>';
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
 
-    // Тело таблицы
+    // Создаем тело таблицы
+    const tbody = document.createElement('tbody');
     for (let r of sortedRows) {
-        html += '<tr>';
+        const row = document.createElement('tr');
         const rowCells = rowsMap.get(r).sort((a,b) => a.col_index - b.col_index);
         for (let cell of rowCells) {
+            const td = document.createElement('td');
+            td.className = 'cell';
+            td.setAttribute('data-cell-id', cell.id);
+            td.setAttribute('data-row', cell.row_index);
+            td.setAttribute('data-col', cell.col_index);
+            
             const lockedBy = lockedCells[cell.id];
-            const lockClass = lockedBy ? 'locked' : '';
-            const lockInfo = lockedBy ? `<div class="lock-info"><i class="fas fa-lock"></i> ${lockedBy}</div>` : '';
-            html += `<td class="cell ${lockClass}" data-cell-id="${cell.id}" data-row="${cell.row_index}" data-col="${cell.col_index}">${escapeHtml(cell.value)}${lockInfo}</td>`;
+            if (lockedBy) {
+                td.classList.add('locked');
+                const lockInfo = document.createElement('div');
+                lockInfo.className = 'lock-info';
+                lockInfo.innerHTML = `<i class="fas fa-lock"></i> ${escapeHtml(lockedBy)}`;
+                td.appendChild(lockInfo);
+            }
+            
+            td.appendChild(document.createTextNode(escapeHtml(cell.value)));
+            row.appendChild(td);
         }
-        html += '</tr>';
+        tbody.appendChild(row);
     }
-    html += '</tbody></table>';
-    container.innerHTML = html;
+    table.appendChild(tbody);
+    fragment.appendChild(table);
+    
+    container.innerHTML = '';
+    container.appendChild(fragment);
 
-    // Добавляем обработчики
-    document.querySelectorAll('.cell').forEach(td => {
-        td.addEventListener('click', () => onCellClick(td.dataset.cellId));
-        td.addEventListener('dblclick', () => onCellDblClick(td.dataset.cellId));
+    // Добавляем обработчики событий (используем event delegation)
+    const tableElement = container.querySelector('table');
+    tableElement.addEventListener('click', (e) => {
+        const cell = e.target.closest('.cell');
+        if (cell) {
+            onCellClick(cell.dataset.cellId);
+        }
+    });
+    
+    tableElement.addEventListener('dblclick', (e) => {
+        const cell = e.target.closest('.cell');
+        if (cell) {
+            onCellDblClick(cell.dataset.cellId);
+        }
     });
 };
 

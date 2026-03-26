@@ -11,7 +11,15 @@
     "logs": "pm2 logs transfers-app",
     "backup": "node scripts/backup.js",
     "restore": "node scripts/restore.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "test:security": "jest tests/security.test.js",
+    "test:performance": "jest tests/performance.test.js",
+    "test:debug": "jest --verbose --no-coverage",
+    "test:ci": "jest --ci --coverage --maxWorkers=2",
+    "lint": "eslint . --ext .js 2>/dev/null || echo 'ESLint not installed'",
+    "audit": "npm audit",
+    "test:all": "bash run-tests.sh"
   },
   "dependencies": {
     "axios": "^1.6.2",
@@ -30,7 +38,10 @@
     "winston": "^3.11.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "socket.io-client": "^4.5.4"
   },
   "engines": {
     "node": ">=14.0.0"

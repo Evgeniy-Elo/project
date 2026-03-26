@@ -4,7 +4,12 @@ const session = require('express-session');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
+const helmet = require('helmet');
+const compression = require('compression');
+const rateLimit = require('express-rate-limit');
 const db = require('./config/db');
+const logger = require('./utils/logger');
+
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const audioRoutes = require('./routes/audio');
@@ -15,27 +20,61 @@ const setupSocketHandlers = require('./sockets');
 
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer);
-
-// Настройка сессии (ОДИН объект для Express и Socket.IO)
-const sessionMiddleware = session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false, httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }
+const io = new Server(httpServer, {
+    cors: {
+        origin: process.env.CORS_ORIGIN || 'http://localhost:8000',
+        methods: ['GET', 'POST']
+    }
 });
 
-// Базовые middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// ============ БЕЗОПАСНОСТЬ ============
+app.use(helmet()); // Защита заголовками
+app.use(compression()); // Сжатие ответов
+
+// Rate limiting для предотвращения brute-force на логин
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 минут
+    max: 5, // максимум 5 попыток
+    message: 'Слишком много попыток входа. Попробуйте позже.',
+    standardHeaders: true,
+    legacyHeaders: false
+});
+
+// Rate limiting для API
+const apiLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 минута
+    max: 100, // максимум 100 запросов в минуту
+    message: 'Слишком много запросов к API. Попробуйте позже.'
+});
+
+// ============ НАСТРОЙКА СЕССИИ ============
+const sessionMiddleware = session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production', // HTTPS только в production
+        httpOnly: true,
+        sameSite: 'strict', // защита от CSRF
+        maxAge: 24 * 60 * 60 * 1000 // 24 часа
+    }
+});
+
+// ============ БАЗОВЫЕ MIDDLEWARE ============
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(sessionMiddleware);
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(apiLimiter); // Общее rate limiting для всех запросов
 
-// ПОДКЛЮЧАЕМ РОУТЫ (ВАЖНО: порядок имеет значение)
+// ============ ПОДКЛЮЧАЕМ РОУТЫ ============
+// Логин с дополнительным rate limiting
+app.use('/auth/login', loginLimiter);
 app.use('/auth', authRoutes);
+
 app.use('/admin', authMiddleware, adminRoutes);
-app.use('/audio', authMiddleware, audioRoutes);  // все API аудио
-app.use('/relay', relayRoutes);  // все API реле
+app.use('/audio', authMiddleware, audioRoutes);
+app.use('/relay', relayRoutes);
 
 // Подключаем ту же сессию к Socket.IO
 io.use((socket, next) => {
@@ -67,10 +106,10 @@ app.get('/admin.html', authMiddleware, requireAnyRole(['admin']), (req, res) => 
 setupSocketHandlers(io, db);
 
 const PORT = process.env.PORT || 8000;
-const HOST = '0.0.0.0'; // ВАЖНО: слушаем на всех интерфейсах!
+const HOST = '0.0.0.0';
 
 httpServer.listen(PORT, HOST, () => {
-    console.log(`🚀 Server running on http://${HOST}:${PORT}`);
+    logger.info(`🚀 Server running on http://${HOST}:${PORT}`);
     console.log(`📱 Доступен в сети по адресу: http://${HOST}:${PORT}`);
     console.log('\n📋 Available pages:');
     console.log('- / (main table) - for all authenticated users');
@@ -85,6 +124,7 @@ httpServer.listen(PORT, HOST, () => {
     for (const name of Object.keys(nets)) {
         for (const net of nets[name]) {
             if (net.family === 'IPv4' && !net.internal) {
+                logger.info(`http://${net.address}:${PORT} (${name})`);
                 console.log(`   http://${net.address}:${PORT} (${name})`);
             }
         }

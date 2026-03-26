@@ -187,6 +187,21 @@ body {
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
+.card h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    margin-top: 0;
+}
+
+.card h2 i {
+    color: var(--primary-color);
+}
+
 /* Badges */
 .badge {
     display: inline-block;
@@ -398,7 +413,251 @@ td.editing textarea {
     border: 2px solid var(--border-color);
     border-radius: 8px;
     font-size: 14px;
-    transition: border-color 0.2s;
+}
+
+/* ============ NOTIFICATIONS ============ */
+.notification {
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text-primary);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: bottom 0.3s ease-in-out;
+    max-width: 90%;
+}
+
+.notification.show {
+    bottom: 24px;
+}
+
+.notification-success {
+    background: var(--success-color);
+}
+
+.notification-error {
+    background: var(--danger-color);
+}
+
+.notification-info {
+    background: var(--primary-color);
+}
+
+.notification i {
+    font-size: 18px;
+}
+
+/* ============ STATUS BAR ============ */
+#status-bar {
+    padding: 12px 24px;
+    background: #e8f0fe;
+    border-top: 1px solid var(--border-color);
+    color: var(--primary-color);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+}
+
+#status-bar[style*="display: none"] {
+    display: none !important;
+}
+
+/* ============ ACCESSIBILITY ============ */
+/* Focus styles для keyboard navigation */
+button:focus,
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: more) {
+    :root {
+        --border-color: #000;
+        --text-primary: #000;
+        --text-secondary: #333;
+    }
+    
+    .btn-primary,
+    .btn-success {
+        border: 2px solid currentColor;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Screen reader only content */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* ============ RESPONSIVE DESIGN (MOBILE) ============ */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .header-left {
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .header-left h1 {
+        font-size: 18px;
+    }
+
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .nav-links {
+        gap: 4px;
+        margin: 0;
+        flex-wrap: wrap;
+    }
+
+    .nav-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .table-container {
+        padding: 12px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    th, td {
+        padding: 8px;
+        font-size: 13px;
+        min-width: 120px;
+    }
+
+    .btn {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .notification {
+        left: 12px;
+        right: 12px;
+        transform: translateX(0);
+        max-width: none;
+    }
+
+    .notification.show {
+        bottom: 12px;
+    }
+
+    .table-container::after {
+        content: '👆 Scroll horizontally to see more';
+        display: block;
+        text-align: center;
+        padding: 12px;
+        color: var(--text-secondary);
+        font-size: 12px;
+        font-weight: 500;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 8px;
+    }
+
+    .header-left h1 {
+        font-size: 16px;
+    }
+
+    .nav-btn {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+
+    .nav-btn i {
+        display: none;
+    }
+
+    .table-container {
+        padding: 8px;
+    }
+
+    th, td {
+        padding: 6px;
+        font-size: 12px;
+        min-width: 100px;
+    }
+
+    table {
+        font-size: 12px;
+    }
+
+    .lock-info {
+        font-size: 11px;
+        padding: 2px 4px;
+    }
+}
+
+/* ============ PRINT STYLES ============ */
+@media print {
+    .header,
+    .nav-links,
+    #logout-btn,
+    .btn {
+        display: none;
+    }
+
+    table {
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+
+    th, td {
+        border: 1px solid #000;
+        page-break-inside: avoid;
+    }
 }
 
 .form-group input:focus,
@@ -406,6 +665,7 @@ td.editing textarea {
 .form-group textarea:focus {
     outline: none;
     border-color: var(--primary-color);
+    transition: border-color 0.2s;
 }
 
 /* Grid layouts */
@@ -414,21 +674,6 @@ td.editing textarea {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
     padding: 20px;
-}
-
-/* Status bar */
-#status-bar {
-    padding: 8px 24px;
-    background: var(--bg-light);
-    border-top: 1px solid var(--border-color);
-    font-size: 13px;
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    position: sticky;
-    bottom: 0;
-    z-index: 90;
 }
 
 /* Error and success messages */
@@ -504,42 +749,6 @@ td.editing textarea {
 
 .tab-content.active {
     display: block;
-}
-
-/* Admin table */
-.admin-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: var(--shadow);
-}
-
-.admin-table th {
-    background: var(--bg-light);
-    padding: 12px;
-    text-align: left;
-    font-weight: 500;
-    color: var(--text-secondary);
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-
-.admin-table td {
-    padding: 12px;
-    border-bottom: 1px solid var(--border-color);
-    font-size: 14px;
-}
-
-.admin-table tr:last-child td {
-    border-bottom: none;
-}
-
-.admin-table tr:hover {
-    background: var(--hover-bg);
 }
 
 /* Role checkboxes */
@@ -1400,29 +1609,6 @@ audio {
 .badge.viewer {
     background: #fff4e5;
     color: #b45f06;
-}
-
-/* Карточки для админки */
-.card {
-    background: white;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: var(--shadow);
-    margin-bottom: 20px;
-}
-
-.card h2 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 18px;
-    font-weight: 500;
-    color: var(--text-primary);
-    margin-bottom: 20px;
-}
-
-.card h2 i {
-    color: var(--primary-color);
 }
 
 /* Улучшенная таблица */
