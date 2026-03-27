@@ -7,7 +7,18 @@ const pool = mysql.createPool({
     database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10,
-    enableKeepAlive: true
+    enableKeepAlive: true,
+    charset: 'utf8mb4',
+    supportBigNumbers: true,
+    bigNumberStrings: true
+});
+
+// При инициализации пула установить charset
+pool.getConnection().then(conn => {
+    conn.query('SET NAMES utf8mb4');
+    conn.release();
+}).catch(err => {
+    console.error('Error setting initial charset:', err.message);
 });
 
 module.exports = pool;

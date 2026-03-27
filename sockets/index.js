@@ -25,13 +25,27 @@ module.exports = (io, db) => {
     io.on('connection', async (socket) => {
         logger.info(`User ${socket.user?.username} connected, socket ${socket.id}`);
 
+        const connection = await db.getConnection();
         try {
+            // Установить ПОЛНЫЙ charset для соединения
+            await connection.query('SET NAMES utf8mb4');
+            await connection.query('SET character_set_connection = utf8mb4');
+            await connection.query('SET character_set_results = utf8mb4');
+            
             // Отправить всю таблицу при подключении
-            const [cells] = await db.query('SELECT * FROM cells ORDER BY row_index, col_index');
+            const [cells] = await connection.query('SELECT * FROM cells ORDER BY row_index, col_index');
+            
+            // Логируем примеры отправляемых данных
+            if (cells.length > 0) {
+                logger.info(`Sending ${cells.length} cells. First cell: row=${cells[0].row_index}, col=${cells[0].col_index}, value="${cells[0].value?.substring(0, 50)}"`);
+            }
+            
             socket.emit('init_cells', cells);
         } catch (error) {
             logger.error(`Error loading cells for ${socket.user?.username}: ${error.message}`);
             socket.emit('error', 'Ошибка при загрузке таблицы');
+        } finally {
+            connection.release();
         }
 
         // Запрос блокировки ячейки

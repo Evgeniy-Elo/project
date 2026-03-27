@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^docker exec mysql-transfers mysql -uevgeniy -p1122 transfers -e \"SELECT value FROM cells WHERE row_index=1 AND col_index=0 LIMIT 1;\" \\| head -5$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

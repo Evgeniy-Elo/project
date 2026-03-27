@@ -52,3 +52,83 @@
 2026-03-27 07:03:57 [INFO]: User admin connected, socket B9OnZV2z0dHqBMzVAAAp
 2026-03-27 07:04:00 [INFO]: User admin disconnected
 2026-03-27 07:04:01 [INFO]: User admin connected, socket x1VMyiqKrrH851_FAAAr
+2026-03-27 07:10:54 [INFO]: 🚀 Server running on http://0.0.0.0:8000
+2026-03-27 07:10:54 [INFO]: http://10.0.10.165:8000 (eth0)
+2026-03-27 07:10:54 [INFO]: http://172.17.0.1:8000 (docker0)
+2026-03-27 07:11:14 [INFO]: 🚀 Server running on http://0.0.0.0:8000
+2026-03-27 07:11:14 [INFO]: http://10.0.10.165:8000 (eth0)
+2026-03-27 07:11:14 [INFO]: http://172.17.0.1:8000 (docker0)
+2026-03-27 07:11:26 [WARN]: Unauthorized socket connection attempt from xMkJorKuRlxMnuY1AAAB
+2026-03-27 07:11:30 [WARN]: Unauthorized socket connection attempt from Ca0PyjzhJsuKS3TuAAAD
+2026-03-27 07:14:32 [INFO]: 🚀 Server running on http://0.0.0.0:8000
+2026-03-27 07:14:32 [INFO]: http://10.0.10.165:8000 (eth0)
+2026-03-27 07:14:32 [INFO]: http://172.17.0.1:8000 (docker0)
+2026-03-27 07:14:41 [WARN]: Unauthorized socket connection attempt from wZOsKzbppdsUWgymAAAB
+2026-03-27 07:14:55 [INFO]: User logged in: admin
+2026-03-27 07:14:55 [INFO]: User admin connected, socket x68EUdyA-0_SYHMzAAAD
+2026-03-27 07:15:00 [INFO]: User admin disconnected
+2026-03-27 07:15:03 [INFO]: User admin connected, socket VPFUfyyWWzKRmnc7AAAF
+2026-03-27 07:16:40 [INFO]: 🚀 Server running on http://0.0.0.0:8000
+2026-03-27 07:16:40 [INFO]: http://10.0.10.165:8000 (eth0)
+2026-03-27 07:16:40 [INFO]: http://172.17.0.1:8000 (docker0)
+2026-03-27 07:17:00 [WARN]: Unauthorized socket connection attempt from -UVTSXyFHEcsYtRWAAAB
+2026-03-27 07:17:11 [INFO]: User logged in: admin
+2026-03-27 07:17:12 [INFO]: User admin connected, socket ntrzOATVNIcUIWyEAAAD
+2026-03-27 07:17:16 [INFO]: User admin disconnected
+2026-03-27 07:17:17 [INFO]: User admin connected, socket iWSkkUyzGAE20FqMAAAF
+2026-03-27 07:18:04 [INFO]: User admin disconnected
+2026-03-27 07:18:10 [WARN]: Unauthorized socket connection attempt from AJgi33wNeRt1rmgfAAAH
+2026-03-27 07:18:18 [INFO]: User logged in: admin
+2026-03-27 07:18:19 [INFO]: User admin connected, socket sG71g0V1HLJzr066AAAJ
+2026-03-27 07:18:58 [INFO]: User logged in: admin
+2026-03-27 07:19:30 [INFO]: 🚀 Server running on http://0.0.0.0:8000
+2026-03-27 07:19:30 [INFO]: http://10.0.10.165:8000 (eth0)
+2026-03-27 07:19:30 [INFO]: http://172.17.0.1:8000 (docker0)
+2026-03-27 07:19:44 [WARN]: Unauthorized socket connection attempt from nc0-OnoR_JPWE9jcAAAB
+2026-03-27 07:19:53 [INFO]: User logged in: admin
+2026-03-27 07:19:53 [INFO]: User admin connected, socket GR34MefAzJ5LPp0eAAAD
+2026-03-27 07:20:03 [INFO]: User admin disconnected
+2026-03-27 07:20:09 [WARN]: Unauthorized socket connection attempt from ZsIzECPUkY9YA3GdAAAF
+2026-03-27 07:20:17 [INFO]: User logged in: admin
+2026-03-27 07:20:18 [INFO]: User admin connected, socket I6GNFaiPW7NSqgdvAAAH
+2026-03-27 07:21:35 [INFO]: 🚀 Server running on http://0.0.0.0:8000
+2026-03-27 07:21:35 [INFO]: http://10.0.10.165:8000 (eth0)
+2026-03-27 07:21:35 [INFO]: http://172.17.0.1:8000 (docker0)
+2026-03-27 07:22:05 [WARN]: Unauthorized socket connection attempt from pX8mBD-73zzqHRUCAAAB
+2026-03-27 07:22:15 [INFO]: User logged in: admin
+2026-03-27 07:22:15 [INFO]: User admin connected, socket eXcSSJp72oHbDoDDAAAD
+2026-03-27 07:22:19 [INFO]: User admin disconnected
+2026-03-27 07:22:19 [INFO]: User admin connected, socket vADBg37rQz0rATjaAAAF
+2026-03-27 07:22:29 [INFO]: User admin disconnected
+2026-03-27 07:22:36 [INFO]: User admin connected, socket GWHQr-1JS03V9hiVAAAH
+2026-03-27 07:22:57 [INFO]: User admin disconnected
+2026-03-27 07:25:51 [INFO]: 🚀 Server running on http://0.0.0.0:8000
+2026-03-27 07:25:51 [INFO]: http://10.0.10.165:8000 (eth0)
+2026-03-27 07:25:51 [INFO]: http://172.17.0.1:8000 (docker0)
+2026-03-27 07:25:59 [WARN]: Unauthorized socket connection attempt from SuiV_hDmMNrskBS8AAAB
+2026-03-27 07:26:08 [INFO]: User logged in: admin
+2026-03-27 07:26:09 [INFO]: User admin connected, socket k0-XWI-qAvsSxSQ6AAAD
+2026-03-27 07:26:11 [INFO]: User admin disconnected
+2026-03-27 07:26:33 [INFO]: User admin connected, socket HSP91H9PfX6Jr6eeAAAF
+2026-03-27 07:26:39 [INFO]: User admin disconnected
+2026-03-27 07:28:02 [INFO]: 🚀 Server running on http://0.0.0.0:8000
+2026-03-27 07:28:02 [INFO]: http://10.0.10.165:8000 (eth0)
+2026-03-27 07:28:02 [INFO]: http://172.17.0.1:8000 (docker0)
+2026-03-27 07:28:28 [WARN]: Unauthorized socket connection attempt from 2f0v2TJ84KgsJ_ctAAAB
+2026-03-27 07:28:37 [INFO]: User logged in: admin
+2026-03-27 07:28:38 [INFO]: User admin connected, socket AxYD18SvrV5NzEvXAAAD
+2026-03-27 07:28:38 [INFO]: Sending 400 cells. First cell: row=0, col=0, value="ÐžÑÑ‚Ñ€Ð¾Ð²ÑÐºÐ¾Ð³Ð¾ 71"
+2026-03-27 07:28:40 [INFO]: User admin disconnected
+2026-03-27 07:29:40 [INFO]: User admin connected, socket nmQGaIGvRQLt0Ya6AAAF
+2026-03-27 07:29:40 [INFO]: Sending 400 cells. First cell: row=0, col=0, value="ÐžÑÑ‚Ñ€Ð¾Ð²ÑÐºÐ¾Ð³Ð¾ 71"
+2026-03-27 07:30:03 [INFO]: User admin disconnected
+2026-03-27 07:33:19 [INFO]: 🚀 Server running on http://0.0.0.0:8000
+2026-03-27 07:33:19 [INFO]: http://10.0.10.165:8000 (eth0)
+2026-03-27 07:33:19 [INFO]: http://172.17.0.1:8000 (docker0)
+2026-03-27 07:33:31 [WARN]: Unauthorized socket connection attempt from Bi9RMTc0bSwNheMnAAAB
+2026-03-27 07:33:40 [INFO]: User logged in: admin
+2026-03-27 07:33:40 [INFO]: User admin connected, socket uTjgyVBRmj50sSH1AAAD
+2026-03-27 07:33:40 [INFO]: Sending 11 cells. First cell: row=0, col=0, value="ÐžÑÑ‚Ñ€Ð¾Ð²ÑÐºÐ¾Ð³Ð¾ 71"
+2026-03-27 07:34:12 [INFO]: 🚀 Server running on http://0.0.0.0:8000
+2026-03-27 07:34:12 [INFO]: http://10.0.10.165:8000 (eth0)
+2026-03-27 07:34:12 [INFO]: http://172.17.0.1:8000 (docker0)

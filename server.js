@@ -31,7 +31,19 @@ const io = new Server(httpServer, {
 app.set('trust proxy', 1); // Для работы с X-Forwarded-For от прокси
 
 // ============ БЕЗОПАСНОСТЬ ============
-app.use(helmet()); // Защита заголовками
+// Конфигурируем helmet с правильной CSP для Google Fonts и Font Awesome
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
+            fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
+            imgSrc: ["'self'", "data:"],
+            connectSrc: ["'self'"]
+        }
+    }
+}));
 app.use(compression()); // Сжатие ответов
 
 // Rate limiting для предотвращения brute-force на логин
